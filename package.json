@@ -1,0 +1,34 @@
+{
+  "name": "belosi",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "slicemachine": "start-slicemachine"
+  },
+  "dependencies": {
+    "@formkit/auto-animate": "^0.9.0",
+    "@nuxt/image": "^2.0.0",
+    "@nuxtjs/prismic": "^5.2.0",
+    "@nuxtjs/tailwindcss": "^6.14.0",
+    "@prismicio/richtext": "^2.1.5",
+    "nuxt": "^4",
+    "sass": "^1.97.3",
+    "vue": "^3.5.28",
+    "vue-router": "^4.6.4"
+  },
+  "devDependencies": {
+    "@nuxt/devtools": "^3.2.1",
+    "@prismicio/client": "^7.21.6",
+    "@slicemachine/adapter-nuxt": "^0.3.95",
+    "@types/node": "^25.3.0",
+    "@volar/vue-language-plugin-pug": "^1.6.5",
+    "@vue/language-plugin-pug": "^3.2.4",
+    "slice-machine-ui": "^2.21.1",
+    "vite-plugin-pug": "^0.4.1"
+  }
+}
