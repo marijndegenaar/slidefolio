@@ -20,33 +20,50 @@
 </template>
 
 <script setup lang="ts">
+import { createClient } from '@prismicio/client'
 import { computed, ref, watch } from 'vue'
-import { useAsyncData, useNuxtApp } from '#app'
+import { useAsyncData, useNuxtApp, useRuntimeConfig } from '#app'
 import type { ProjectDocument, AboutDocument } from '~~/prismicio-types'
 import type { Query } from '@prismicio/client'
 
-const { data: projectsData } = await useAsyncData('index-projects', async (): Promise<Query<ProjectDocument>> => {
-  const { $prismic } = useNuxtApp()
-  if ($prismic?.client) return $prismic.client.getByType('project')
-  return { results: [], page: 1, results_per_page: 100, results_size: 0, total_results_size: 0, total_pages: 0, next_page: null, prev_page: null }
-})
-const { data: aboutData } = await useAsyncData('index-about', async (): Promise<AboutDocument | null> => {
-  const { $prismic } = useNuxtApp()
-  if ($prismic?.client) return $prismic.client.getSingle('about')
-  return null
-})
+const nuxtApp = useNuxtApp()
+const config = useRuntimeConfig()
+const prismicConfig = config.public?.prismic as { endpoint?: string } | undefined
+const endpoint = prismicConfig?.endpoint ?? 'belosi'
+const getClient = () => nuxtApp.$prismic?.client ?? createClient(endpoint)
+
+const { data: projectsData } = await useAsyncData(
+  'index-projects',
+  async (): Promise<Query<ProjectDocument>> => {
+    const c = getClient()
+    return c.getByType('project')
+  },
+  { server: true, lazy: false }
+)
+const { data: aboutData } = await useAsyncData(
+  'index-about',
+  async (): Promise<AboutDocument | null> => {
+    const c = getClient()
+    return c.getSingle('about')
+  },
+  { server: true, lazy: false }
+)
 
 const projects = computed<ProjectDocument[]>(() => projectsData.value?.results ?? [])
 const about = computed<AboutDocument | null>(() => aboutData.value ?? null)
 
-const selectedProject = ref<ProjectDocument | null>(null)
+const selectedUid = ref<string | null>(null)
+const selectedProject = computed(() => {
+  const list = projects.value
+  if (selectedUid.value) return list.find(p => p.uid === selectedUid.value) ?? list[0] ?? null
+  return list[0] ?? null
+})
+
 const infoOpen = ref(false)
 
 watch(projects, (list) => {
   const first = list[0]
-  if (first && !selectedProject.value) {
-    selectedProject.value = first
-  }
+  if (first && !selectedUid.value) selectedUid.value = first.uid
 }, { immediate: true })
 
 const slideshowItems = computed(() =>
@@ -54,10 +71,6 @@ const slideshowItems = computed(() =>
 )
 
 function onSelectProject(project?: ProjectDocument) {
-  if (project) {
-    selectedProject.value = project
-  } else {
-    selectedProject.value = null
-  }
+  selectedUid.value = project?.uid ?? null
 }
 </script>

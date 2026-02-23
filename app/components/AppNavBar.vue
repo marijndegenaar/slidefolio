@@ -44,7 +44,6 @@
               type="button"
               @click="emit('toggle-info')"
             ) INFO
-            span.uppercase.text-white.tracking-wide.opacity-80 CONTACT
 </template>
 
 <script setup lang="ts">

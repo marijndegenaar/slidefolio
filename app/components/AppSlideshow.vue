@@ -1,27 +1,32 @@
 <template lang="pug">
-  div.fixed.inset-0.z-0.bg-neutral-800(
-    role="button"
-    tabindex="0"
-    @click="next"
-    @keydown.space.prevent="next"
-    @keydown.enter.prevent="next"
-  )
-    template(v-if="slideshow.length")
-      div.absolute.inset-0(
-        v-for="(slide, i) in slideshow"
-        :key="i"
-        :class="{ 'opacity-100 z-10': i === currentIndex, 'opacity-0 pointer-events-none': i !== currentIndex }"
+div.fixed.inset-0.z-0.bg-neutral-800(
+  role="button"
+  tabindex="0"
+  @click="next"
+  @keydown.space.prevent="next"
+  @keydown.enter.prevent="next"
+)
+  template(v-if="slideshow.length")
+    div.absolute.inset-0(
+      v-for="(slide, i) in slideshow"
+      :key="i"
+      :class="{ 'opacity-100 z-10': i === currentIndex, 'opacity-0 pointer-events-none': i !== currentIndex }"
+    )
+      PrismicImage(
+        :field="slide.image"
+        :class="objectFit === 'cover' ? 'w-full h-full object-cover' : 'w-full h-full object-contain'"
       )
-        PrismicImage(
-          :field="slide.image"
-          class="w-full h-full object-cover"
-        )
-        p(
-          v-if="slide.caption"
-          class="absolute bottom-4 left-4 right-4 text-white text-sm drop-shadow-md"
-        ) {{ slide.caption }}
-    div.v-else.flex.items-center.justify-center.text-neutral-400
-      p No slides
+      p(
+        v-if="slide.caption"
+        class="absolute bottom-4 left-4 right-4 text-white text-sm drop-shadow-md"
+      ) {{ slide.caption }}
+  div.flex.items-center.justify-center.text-neutral-400(v-else)
+    p No slides
+  button.absolute.bottom-4.right-4.z-20.p-2.rounded.text-white.text-xs.uppercase.tracking-wide(
+    type="button"
+    class="bg-black/60 hover_bg-black/80 backdrop-blur-sm"
+    @click.stop="toggleObjectFit"
+  ) {{ objectFit }}
 </template>
 
 <script setup lang="ts">
@@ -32,6 +37,11 @@ const props = defineProps<{
 }>()
 
 const currentIndex = ref(0)
+const objectFit = ref<'cover' | 'contain'>('cover')
+
+function toggleObjectFit() {
+  objectFit.value = objectFit.value === 'cover' ? 'contain' : 'cover'
+}
 
 watch(() => props.slideshow, () => {
   currentIndex.value = 0
