@@ -1,29 +1,21 @@
 <template lang="pug">
-div.fixed.inset-0.z-30.flex.items-center.justify-center.p-6(
+div.relative.overflow-y-auto.p-3.w-2x12.border.border-stone-700(
+  ref="panelRef"
   role="dialog"
-  aria-modal="true"
   aria-label="Info"
   tabindex="-1"
+  class="bg-black-40 backdrop-blur-sm"
   @keydown.escape="emit('close')"
 )
-  .fixed.inset-0(
-    aria-hidden="true"
-    class="bg-black/70"
+  button.absolute.right-4.top-4.p-2.opacity-80(
+    type="button"
+    class="hover_opacity-100"
+    aria-label="Close"
     @click="emit('close')"
-  )
-  .relative.z-10.max-h-full.max-w-2xl.overflow-y-auto.rounded-lg.bg-neutral-900.p-8.text-white.shadow-xl(
-    ref="panelRef"
-    @click.stop
-  )
-    button.absolute.right-4.top-4.p-2.text-white.opacity-80(
-      type="button"
-      class="hover_opacity-100"
-      aria-label="Close"
-      @click="emit('close')"
-    ) ×
-    div.text-white(v-if="hasContent")
-      PrismicRichText(:field="field")
-    p.text-neutral-400(v-else) No content
+  ) ×
+  div(v-if="hasContent")
+    PrismicRichText(:field="field")
+  p(v-else) No content
 </template>
 
 <script setup lang="ts">

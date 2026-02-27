@@ -1,49 +1,51 @@
 <template lang="pug">
   div
-    .fixed.inset-0.z-10(
-      v-if="dropdownOpen"
-      aria-hidden="true"
-      @click="dropdownOpen = false"
-    )
-    nav.fixed.left-0.right-0.top-1x2.-translate-y-1x2.z-20
-      .w-full.px-6(
-        class="bg-black/60 backdrop-blur-sm"
+    //- .fixed.inset-0.z-10(
+    //-   v-if="dropdownOpen"
+    //-   aria-hidden="true"
+    //-   @click="dropdownOpen = false"
+    //- )
+    nav.fixed.right-0.top-1x2.-translate-y-1x2.z-2000.w-11x12.border-stone-700.border.right-0(
+        class="bg-black-40 backdrop-blur-sm"
       )
-        .flex.items-center.gap-8.py-4
-          .relative.flex-shrink-0(ref="dropdownWrapRef")
-            button.flex.items-center.gap-2.uppercase.text-white.tracking-wide.hover_opacity-80.text-left(
-              type="button"
-              :aria-expanded="dropdownOpen"
-              aria-haspopup="true"
-              @click.stop="dropdownOpen = !dropdownOpen"
+      .absolute.bottom-full.left-0.w-full
+        slot
+      .flex.items-center.gap-8
+        .flex.items-center.gap-6.flex-shrink-0
+          button.hover_opacity-80.px-3(
+            type="button"
+            @click="emit('toggle-info')"
+          ) INFO
+        .flex-1.text-center
+          span ARCHITECTURE & SCENOGRAPHY
+        
+        .relative.flex-shrink-0(ref="dropdownWrapRef").w-1x4.border-l.border-stone-700.px-2
+          button.flex.items-center.hover_opacity-80.text-left(
+            type="button"
+            :aria-expanded="dropdownOpen"
+            aria-haspopup="true"
+            @click.stop="dropdownOpen = !dropdownOpen"
+          )
+            span {{ currentProjectLabel }}
+            span(
+              :class="dropdownOpen ? 'rotate-180' : ''"
+            ) 
+          .absolute.left-0.top-full.w-full(
+            v-if="dropdownOpen"
+          )
+            ul.list-none.backdrop-blur-sm.border.border-stone-700.border-b-0(
+              class="max-h-80 overflow-y-auto bg-black-80"
             )
-              span {{ currentProjectLabel }}
-              span.text-sm(
-                :class="dropdownOpen ? 'rotate-180' : ''"
-              ) ▼
-            .absolute.left-0.top-full.pt-2(
-              v-if="dropdownOpen"
-            )
-              ul.min-w-72.list-none.backdrop-blur-sm.p-2(
-                class="shadow-xl max-h-80 overflow-y-auto bg-black/80"
+              li(
+                v-for="project in projects"
+                :key="project.uid"
               )
-                li(
-                  v-for="project in projects"
-                  :key="project.uid"
-                )
-                  button.w-full.text-left.uppercase.text-white.py-2.px-3.tracking-wide(
-                    type="button"
-                    class="hover_bg-white/10"
-                    :class="{ 'bg-white/10': project.uid === selectedUid }"
-                    @click="onSelect(project)"
-                  ) {{ projectLabel(project) }}
-          .flex-1.text-center.uppercase.text-white.tracking-wide.opacity-90.text-sm
-            span ARCHITECTURE & SCENOGRAPHY
-          .flex.items-center.gap-6.flex-shrink-0
-            button.uppercase.text-white.tracking-wide.hover_opacity-80(
-              type="button"
-              @click="emit('toggle-info')"
-            ) INFO
+                button.w-full.text-left.px-2.border-b.border-stone-700(
+                  type="button"
+                  class="hover_bg-white-10"
+                  :class="{ 'bg-white-10': project.uid === selectedUid }"
+                  @click="onSelect(project)"
+                ) {{ projectLabel(project) }}
 </template>
 
 <script setup lang="ts">

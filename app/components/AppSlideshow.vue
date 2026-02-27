@@ -18,15 +18,15 @@ div.fixed.inset-0.z-0.bg-neutral-800(
       )
       p(
         v-if="slide.caption"
-        class="absolute bottom-4 left-4 right-4 text-white text-sm drop-shadow-md"
+        class="absolute bottom-4 left-4 right-4"
       ) {{ slide.caption }}
-  div.flex.items-center.justify-center.text-neutral-400(v-else)
+  div.flex.items-center.justify-center(v-else)
     p No slides
-  button.absolute.bottom-4.right-4.z-20.p-2.rounded.text-white.text-xs.uppercase.tracking-wide(
-    type="button"
-    class="bg-black/60 hover_bg-black/80 backdrop-blur-sm"
-    @click.stop="toggleObjectFit"
-  ) {{ objectFit }}
+  //- button.absolute.bottom-4.right-4.z-20.p-2.rounded.text-xs.uppercase.tracking-wide(
+  //-   type="button"
+  //-   class="bg-black-60 hover_bg-black-80 backdrop-blur-sm"
+  //-   @click.stop="toggleObjectFit"
+  //- ) {{ objectFit }}
 </template>
 
 <script setup lang="ts">

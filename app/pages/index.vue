@@ -11,7 +11,6 @@
       @select-project="onSelectProject"
       @toggle-info="infoOpen = !infoOpen"
     )
-    Teleport(to="body")
       AppInfoPanel(
         v-if="infoOpen"
         :field="about?.data?.information"
@@ -20,11 +19,11 @@
 </template>
 
 <script setup lang="ts">
-import { createClient } from '@prismicio/client'
-import { computed, ref, watch } from 'vue'
-import { useAsyncData, useNuxtApp, useRuntimeConfig } from '#app'
-import type { ProjectDocument, AboutDocument } from '~~/prismicio-types'
-import type { Query } from '@prismicio/client'
+// import { createClient } from '@prismicio/client'
+// import { computed, ref, watch } from 'vue'
+// import { useAsyncData, useNuxtApp, useRuntimeConfig } from '#app'
+// import type { ProjectDocument, AboutDocument } from '~~/prismicio-types'
+// import type { Query } from '@prismicio/client'
 
 const nuxtApp = useNuxtApp()
 const config = useRuntimeConfig()
@@ -52,7 +51,8 @@ const { data: aboutData } = await useAsyncData(
 const projects = computed<ProjectDocument[]>(() => projectsData.value?.results ?? [])
 const about = computed<AboutDocument | null>(() => aboutData.value ?? null)
 
-const selectedUid = ref<string | null>(null)
+// useState so selectedUid is serialized and matches on client (avoids hydration mismatch)
+const selectedUid = useState<string | null>('index-selected-uid', () => null)
 const selectedProject = computed(() => {
   const list = projects.value
   if (selectedUid.value) return list.find(p => p.uid === selectedUid.value) ?? list[0] ?? null

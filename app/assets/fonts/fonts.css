@@ -1,1 +1,6 @@
 /* Global font face and font-family rules */
+@font-face {
+    font-family: 'A';
+    src: url('assets/fonts/a-reg.ttf') format('truetype');
+    font-style: normal;
+}
