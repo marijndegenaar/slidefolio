@@ -5,7 +5,7 @@
     //-   aria-hidden="true"
     //-   @click="dropdownOpen = false"
     //- )
-    nav.fixed.right-0.top-1x2.-translate-y-1x2.z-2000.w-11x12.border-stone-700.border.right-0(
+    nav.fixed.right-0.top-1x2.-translate-y-1x2.z-2000.border-stone-700.border.right-0.w-11x12(
         class="bg-black-40 backdrop-blur-sm"
       )
       .absolute.bottom-full.left-0.w-full
@@ -16,7 +16,7 @@
             type="button"
             @click="emit('toggle-info')"
           ) INFO
-        .flex-1.text-center
+        .flex-1.text-center.w-1x2
           span ARCHITECTURE & SCENOGRAPHY
         
         .relative.flex-shrink-0(ref="dropdownWrapRef").w-1x4.border-l.border-stone-700.px-2
@@ -26,21 +26,37 @@
             aria-haspopup="true"
             @click.stop="dropdownOpen = !dropdownOpen"
           )
-            span {{ currentProjectLabel }}
+            span(:class="{ 'invisible': dropdownOpen }") {{ currentProjectLabel }}
             span(
               :class="dropdownOpen ? 'rotate-180' : ''"
             ) 
-          .absolute.left-0.top-full.w-full(
+          .absolute.-left-px.-right-px.bottom-full(
             v-if="dropdownOpen"
           )
-            ul.list-none.backdrop-blur-sm.border.border-stone-700.border-b-0(
-              class="max-h-80 overflow-y-auto bg-black-80"
+            ul.list-none.backdrop-blur-sm.border.border-stone-700.divide-y.divide-stone-700(
+              class="bg-black-80"
             )
               li(
-                v-for="project in projects"
+                v-for="project in topProjects"
                 :key="project.uid"
               )
-                button.w-full.text-left.px-2.border-b.border-stone-700(
+                button.w-full.text-left.px-2(
+                  type="button"
+                  class="hover_bg-white-10"
+                  :class="{ 'bg-white-10': project.uid === selectedUid }"
+                  @click="onSelect(project)"
+                ) {{ projectLabel(project) }}
+          .absolute.-left-px.-right-px.top-full(
+            v-if="dropdownOpen"
+          )
+            ul.list-none.backdrop-blur-sm.border.border-stone-700.divide-y.divide-stone-700(
+              class="bg-black-80"
+            )
+              li(
+                v-for="project in bottomProjects"
+                :key="project.uid"
+              )
+                button.w-full.text-left.px-2(
                   type="button"
                   class="hover_bg-white-10"
                   :class="{ 'bg-white-10': project.uid === selectedUid }"
@@ -64,6 +80,16 @@ const emit = defineEmits<{
 
 const dropdownOpen = ref(false)
 const dropdownWrapRef = ref<HTMLElement | null>(null)
+
+const topProjects = computed(() => {
+  const n = props.projects.length
+  return props.projects.slice(0, Math.ceil(n / 2))
+})
+
+const bottomProjects = computed(() => {
+  const n = props.projects.length
+  return props.projects.slice(Math.ceil(n / 2))
+})
 
 const selectedProject = computed(() =>
   props.projects.find(p => p.uid === props.selectedUid) ?? props.projects[0] ?? null,
