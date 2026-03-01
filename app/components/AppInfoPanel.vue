@@ -1,5 +1,5 @@
 <template lang="pug">
-div.relative.overflow-y-auto.px-2.py-1.w-2x12.border.border-stone-700.-translate-x-px(
+div.relative.overflow-y-auto.px-2.py-1.w-1x4.md_w-2x12.border.border-stone-700.-translate-x-px(
   ref="panelRef"
   role="dialog"
   aria-label="Info"
