@@ -16,13 +16,8 @@ div.fixed.inset-0.z-0.bg-neutral-800(
       :key="i"
       :class="{ 'opacity-100 z-10': i === currentIndex, 'opacity-0 pointer-events-none': i !== currentIndex }"
     )
-      NuxtImg(
-        provider="prismic"
-        :src="slide.image.url"
-        :alt="slide.image.alt || ''"
-        :width="slide.image.dimensions?.width"
-        :height="slide.image.dimensions?.height"
-        sizes="100vw"
+      PrismicImage(
+        :field="slide.image"
         :loading="i === currentIndex ? 'eager' : 'lazy'"
         :class="objectFit === 'cover' ? 'w-full h-full object-cover' : 'w-full h-full object-contain'"
       )

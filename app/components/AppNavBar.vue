@@ -16,11 +16,11 @@
             type="button"
             @click="emit('toggle-info')"
           ) INFO
-        .title-swap.flex-1.text-center.w-1x3.md-1x2
+        .title-swap.flex-1.text-center.w-1x3
           span.title-swap__label ARCHITECTURE & SCENOGRAPHY
           span.title-swap__label.title-swap__label--alt ANDREA BELOSI
         
-        .relative.flex-shrink-0(ref="dropdownWrapRef").w-1x4.border-l.border-stone-700.px-2
+        .relative.flex-shrink-0(ref="dropdownWrapRef").w-1x3.border-l.border-stone-700.px-2
           button.flex.items-center.hover_opacity-80.text-left(
             type="button"
             :aria-expanded="dropdownOpen"

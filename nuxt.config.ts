@@ -20,7 +20,5 @@ export default defineNuxtConfig({
     preview: false,
   },
 
-  image: {
-    prismic: {},
-  },
+  image: {},
 })
