@@ -3,11 +3,13 @@
     AppSlideshow(
       :key="selectedProject?.uid ?? 'none'"
       :slideshow="slideshowItems"
+      @advance="onSlideshowAdvance"
     )
     AppNavBar(
       :projects="projects"
       :selected-uid="selectedProject?.uid ?? null"
       :info-open="infoOpen"
+      :close-menus="closeMenusTrigger"
       @select-project="onSelectProject"
       @toggle-info="infoOpen = !infoOpen"
     )
@@ -60,6 +62,7 @@ const selectedProject = computed(() => {
 })
 
 const infoOpen = ref(false)
+const closeMenusTrigger = ref(0)
 
 watch(projects, (list) => {
   const first = list[0]
@@ -69,6 +72,11 @@ watch(projects, (list) => {
 const slideshowItems = computed(() =>
   selectedProject.value?.data?.slideshow ?? [],
 )
+
+function onSlideshowAdvance() {
+  infoOpen.value = false
+  closeMenusTrigger.value++
+}
 
 function onSelectProject(project?: ProjectDocument) {
   selectedUid.value = project?.uid ?? null

@@ -5,7 +5,7 @@
     //-   aria-hidden="true"
     //-   @click="dropdownOpen = false"
     //- )
-    nav.fixed.right-0.top-1x2.-translate-y-1x2.z-2000.border-stone-700.border.right-0.w-11x12(
+    nav.fixed.right-0.top-1x2.-translate-y-1x2.z-2000.border-stone-700.border.right-0.w-11x12.opacity-80(
         class="bg-black-40 backdrop-blur-sm"
       )
       .absolute.bottom-full.left-0.w-full
@@ -16,8 +16,9 @@
             type="button"
             @click="emit('toggle-info')"
           ) INFO
-        .flex-1.text-center.w-1x2
-          span ARCHITECTURE & SCENOGRAPHY
+        .title-swap.flex-1.text-center.w-1x3.md-1x2
+          span.title-swap__label ARCHITECTURE & SCENOGRAPHY
+          span.title-swap__label.title-swap__label--alt ANDREA BELOSI
         
         .relative.flex-shrink-0(ref="dropdownWrapRef").w-1x4.border-l.border-stone-700.px-2
           button.flex.items-center.hover_opacity-80.text-left(
@@ -71,6 +72,7 @@ const props = defineProps<{
   projects: ProjectDocument[]
   selectedUid: string | null
   infoOpen: boolean
+  closeMenus: number
 }>()
 
 const emit = defineEmits<{
@@ -80,6 +82,10 @@ const emit = defineEmits<{
 
 const dropdownOpen = ref(false)
 const dropdownWrapRef = ref<HTMLElement | null>(null)
+
+watch(() => props.closeMenus, () => {
+  dropdownOpen.value = false
+})
 
 const topProjects = computed(() => {
   const n = props.projects.length
@@ -114,3 +120,31 @@ function onSelect(project: ProjectDocument) {
   emit('select-project', project)
 }
 </script>
+
+<style scoped>
+.title-swap {
+  position: relative;
+  transform: translatex(6vw);
+}
+
+.title-swap__label {
+  transition: opacity 0.2s ease;
+}
+
+.title-swap__label--alt {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+}
+
+.title-swap:hover .title-swap__label:not(.title-swap__label--alt) {
+  opacity: 0;
+}
+
+.title-swap:hover .title-swap__label--alt {
+  opacity: 1;
+}
+</style>

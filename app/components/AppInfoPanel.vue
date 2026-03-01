@@ -1,13 +1,13 @@
 <template lang="pug">
-div.relative.overflow-y-auto.p-3.w-2x12.border.border-stone-700(
+div.relative.overflow-y-auto.px-2.py-1.w-2x12.border.border-stone-700.-translate-x-px(
   ref="panelRef"
   role="dialog"
   aria-label="Info"
   tabindex="-1"
-  class="bg-black-40 backdrop-blur-sm"
+  class="bg-black-80 backdrop-blur-sm"
   @keydown.escape="emit('close')"
 )
-  button.absolute.right-4.top-4.p-2.opacity-80(
+  button.absolute.right-2.top-1.opacity-80(
     type="button"
     class="hover_opacity-100"
     aria-label="Close"
@@ -39,3 +39,10 @@ onMounted(() => {
   panelRef.value?.focus()
 })
 </script>
+<style lang="sass" scoped>
+:deep(p)
+  a:link, a:visited
+    opacity: .8
+  a:hover, a:focus
+    opacity: 1
+</style>

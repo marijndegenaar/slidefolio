@@ -19,4 +19,8 @@ export default defineNuxtConfig({
     toolbar: false,
     preview: false,
   },
+
+  image: {
+    prismic: {},
+  },
 })

@@ -16,13 +16,19 @@ div.fixed.inset-0.z-0.bg-neutral-800(
       :key="i"
       :class="{ 'opacity-100 z-10': i === currentIndex, 'opacity-0 pointer-events-none': i !== currentIndex }"
     )
-      PrismicImage(
-        :field="slide.image"
+      NuxtImg(
+        provider="prismic"
+        :src="slide.image.url"
+        :alt="slide.image.alt || ''"
+        :width="slide.image.dimensions?.width"
+        :height="slide.image.dimensions?.height"
+        sizes="100vw"
+        :loading="i === currentIndex ? 'eager' : 'lazy'"
         :class="objectFit === 'cover' ? 'w-full h-full object-cover' : 'w-full h-full object-contain'"
       )
       p(
         v-if="slide.caption"
-        class="absolute bottom-4 left-4 right-4 text-gray-700"
+        class="absolute bottom-4 left-4 right-4 opacity-60"
       ) {{ slide.caption }}
   div.flex.items-center.justify-center(v-else)
     p No slides
@@ -37,6 +43,10 @@ import type { ProjectDocumentDataSlideshowItem } from '~~/prismicio-types'
 
 const props = defineProps<{
   slideshow: ProjectDocumentDataSlideshowItem[]
+}>()
+
+const emit = defineEmits<{
+  advance: []
 }>()
 
 const currentIndex = ref(0)
@@ -67,6 +77,8 @@ watch(() => props.slideshow, () => {
 function next() {
   if (!props.slideshow.length) return
   currentIndex.value = (currentIndex.value + 1) % props.slideshow.length
+  emit('advance')
+
 }
 </script>
 

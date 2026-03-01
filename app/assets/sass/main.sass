@@ -3,4 +3,20 @@ body,html
     font-size: 13px
     letter-spacing: 0.04em
     color: #e0dee5
-    line-height: 1.4
+    line-height: 1.5
+    -webkit-user-select: none
+    user-select: none
+
+img
+    pointer-events: none
+    -webkit-user-drag: none
+
+@media screen and (max-width: 768px) and (orientation: portrait)
+  html
+    overflow: hidden
+  body
+    width: 100vh
+    height: 100vw
+    transform-origin: top left
+    transform: rotate(90deg) translateY(-100%)
+    overflow: hidden
