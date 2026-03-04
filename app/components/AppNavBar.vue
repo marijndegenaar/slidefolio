@@ -16,11 +16,11 @@
             type="button"
             @click="emit('toggle-info')"
           ) INFO
-        .title-swap.flex-1.text-center.w-1x3
+        .title-swap.flex-1.md_text-center.w-1x3
           span.title-swap__label ARCHITECTURE & SCENOGRAPHY
           span.title-swap__label.title-swap__label--alt ANDREA BELOSI
         
-        .relative.flex-shrink-0(ref="dropdownWrapRef").w-1x3.border-l.border-stone-700.px-2
+        .relative.flex-shrink-0(ref="dropdownWrapRef").w-1x2.md_w-1x3.border-l.border-stone-700.px-2.py-2.md_py-0
           button.flex.items-center.hover_opacity-80.text-left(
             type="button"
             :aria-expanded="dropdownOpen"
@@ -41,7 +41,7 @@
                 v-for="project in topProjects"
                 :key="project.uid"
               )
-                button.w-full.text-left.px-2(
+                button.w-full.text-left.px-2.py-2.md_py-0(
                   type="button"
                   class="hover_bg-white-10"
                   :class="{ 'bg-white-10': project.uid === selectedUid }"
@@ -57,7 +57,7 @@
                 v-for="project in bottomProjects"
                 :key="project.uid"
               )
-                button.w-full.text-left.px-2(
+                button.w-full.text-left.px-2.py-2.md_py-0(
                   type="button"
                   class="hover_bg-white-10"
                   :class="{ 'bg-white-10': project.uid === selectedUid }"
@@ -124,7 +124,7 @@ function onSelect(project: ProjectDocument) {
 <style scoped>
 .title-swap {
   position: relative;
-  transform: translatex(6vw);
+  transform: translatex(9.1vw);
 }
 
 .title-swap__label {
