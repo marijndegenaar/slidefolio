@@ -18,6 +18,7 @@
         :field="about?.data?.information"
         @close="infoOpen = false"
       )
+  a.credit.fixed.text-xs.bottom-2.right-2.mix-difference.opacity-30.uppercase(href="http://marijdegenaar.net") site by MD
 </template>
 
 <script setup lang="ts">
@@ -50,7 +51,25 @@ const { data: aboutData } = await useAsyncData(
   { server: true, lazy: false }
 )
 
-const projects = computed<ProjectDocument[]>(() => projectsData.value?.results ?? [])
+const projects = computed<ProjectDocument[]>(() => {
+  const all = projectsData.value?.results ?? []
+  const order = aboutData.value?.data?.project_order
+  if (!order?.length) return all
+
+  const idOrder = order
+    .map(item => item.project?.id)
+    .filter(Boolean) as string[]
+
+  const ordered: ProjectDocument[] = []
+  for (const id of idOrder) {
+    const found = all.find(p => p.id === id)
+    if (found) ordered.push(found)
+  }
+  for (const p of all) {
+    if (!ordered.includes(p)) ordered.push(p)
+  }
+  return ordered
+})
 const about = computed<AboutDocument | null>(() => aboutData.value ?? null)
 
 // useState so selectedUid is serialized and matches on client (avoids hydration mismatch)
@@ -64,9 +83,12 @@ const selectedProject = computed(() => {
 const infoOpen = ref(false)
 const closeMenusTrigger = ref(0)
 
+const featuredId = computed(() => aboutData.value?.data?.featured_project?.id ?? null)
+
 watch(projects, (list) => {
-  const first = list[0]
-  if (first && !selectedUid.value) selectedUid.value = first.uid
+  if (selectedUid.value) return
+  const featured = featuredId.value ? list.find(p => p.id === featuredId.value) : null
+  selectedUid.value = featured?.uid ?? list[0]?.uid ?? null
 }, { immediate: true })
 
 const slideshowItems = computed(() =>

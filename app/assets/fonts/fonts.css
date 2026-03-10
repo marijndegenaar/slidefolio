@@ -1,19 +1,19 @@
 /* Global font face and font-family rules */
 @font-face {
     font-family: 'A';
-    src: url('assets/fonts/a-thin.ttf') format('truetype');
+    src: url('./a-thin.ttf') format('truetype');
     font-style: normal;
     font-weight: 100;
 }
 @font-face {
     font-family: 'A';
-    src: url('assets/fonts/a-light.ttf') format('truetype');
+    src: url('./a-light.ttf') format('truetype');
     font-style: normal;
     font-weight: 200;
 }
 @font-face {
     font-family: 'A';
-    src: url('assets/fonts/a-reg.ttf') format('truetype');
+    src: url('./a-reg.ttf') format('truetype');
     font-style: normal;
     font-weight: 500;
 }

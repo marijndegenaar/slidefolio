@@ -10,24 +10,26 @@
       )
       .absolute.bottom-full.left-0.w-full
         slot
+      .title-swap.hidden.md_block
+        span.title-swap__label ARCHITECTURE & SCENOGRAPHY
+        span.title-swap__label.title-swap__label--alt ANDREA BELOSI
       .flex.items-center.gap-8
         .flex.items-center.gap-6.flex-shrink-0
           button.hover_opacity-80.px-3(
             type="button"
             @click="emit('toggle-info')"
           ) INFO
-        .title-swap.flex-1.md_text-center.w-1x3
-          span.title-swap__label ARCHITECTURE & SCENOGRAPHY
-          span.title-swap__label.title-swap__label--alt ANDREA BELOSI
-        
-        .relative.flex-shrink-0(ref="dropdownWrapRef").w-1x2.md_w-1x3.border-l.border-stone-700.px-2.py-2.md_py-0
+        .flex-1
+        .relative.flex-shrink-0(ref="dropdownWrapRef").w-1x2.md_w-1x3.border-l.border-stone-700.px-2.md_py-0
           button.flex.items-center.hover_opacity-80.text-left(
             type="button"
             :aria-expanded="dropdownOpen"
             aria-haspopup="true"
             @click.stop="dropdownOpen = !dropdownOpen"
           )
-            span(:class="{ 'invisible': dropdownOpen }") {{ currentProjectLabel }}
+            span(:class="{ 'invisible': dropdownOpen }")
+              strong {{ selectedProject?.data.title ?? 'Select project' }}
+              template(v-if="projectMeta(selectedProject)") , {{ projectMeta(selectedProject) }}
             span(
               :class="dropdownOpen ? 'rotate-180' : ''"
             ) 
@@ -41,12 +43,14 @@
                 v-for="project in topProjects"
                 :key="project.uid"
               )
-                button.w-full.text-left.px-2.py-2.md_py-0(
+                button.w-full.text-left.px-2.py-1.md_py-0(
                   type="button"
                   class="hover_bg-white-10"
                   :class="{ 'bg-white-10': project.uid === selectedUid }"
                   @click="onSelect(project)"
-                ) {{ projectLabel(project) }}
+                )
+                  strong {{ project.data.title ?? 'Untitled' }}
+                  template(v-if="projectMeta(project)") , {{ projectMeta(project) }}
           .absolute.-left-px.-right-px.top-full(
             v-if="dropdownOpen"
           )
@@ -57,12 +61,14 @@
                 v-for="project in bottomProjects"
                 :key="project.uid"
               )
-                button.w-full.text-left.px-2.py-2.md_py-0(
+                button.w-full.text-left.px-2.py-1.md_py-0(
                   type="button"
                   class="hover_bg-white-10"
                   :class="{ 'bg-white-10': project.uid === selectedUid }"
                   @click="onSelect(project)"
-                ) {{ projectLabel(project) }}
+                )
+                  strong {{ project.data.title ?? 'Untitled' }}
+                  template(v-if="projectMeta(project)") , {{ projectMeta(project) }}
 </template>
 
 <script setup lang="ts">
@@ -101,14 +107,10 @@ const selectedProject = computed(() =>
   props.projects.find(p => p.uid === props.selectedUid) ?? props.projects[0] ?? null,
 )
 
-const currentProjectLabel = computed(() => {
-  const p = selectedProject.value
-  return p ? projectLabel(p) : 'Select project'
-})
-
-function projectLabel(project: ProjectDocument) {
+function projectMeta(project: ProjectDocument | null) {
+  if (!project) return ''
   const d = project.data
-  const parts = [d.title ?? 'Untitled']
+  const parts: string[] = []
   if (d.year) parts.push(d.year)
   if (d.location) parts.push(d.location)
   if (d.project_type) parts.push(d.project_type)
@@ -123,8 +125,13 @@ function onSelect(project: ProjectDocument) {
 
 <style scoped>
 .title-swap {
-  position: relative;
-  transform: translatex(9.1vw);
+  position: absolute;
+  left: calc(50vw - 100vw / 12);
+  top: 50%;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  pointer-events: auto;
+  z-index: 1;
 }
 
 .title-swap__label {

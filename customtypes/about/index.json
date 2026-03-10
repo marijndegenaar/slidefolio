@@ -15,6 +15,31 @@
           "multi": "paragraph,hyperlink"
         }
       },
+      "featured_project": {
+        "type": "Link",
+        "config": {
+          "label": "Featured Project",
+          "select": "document",
+          "customtypes": ["project"]
+        }
+      },
+      "project_order": {
+        "type": "Group",
+        "config": {
+          "label": "Project Order",
+          "repeat": true,
+          "fields": {
+            "project": {
+              "type": "Link",
+              "config": {
+                "label": "Project",
+                "select": "document",
+                "customtypes": ["project"]
+              }
+            }
+          }
+        }
+      },
       "slices": {
         "type": "Slices",
         "fieldset": "Slice Zone",

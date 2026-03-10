@@ -69,6 +69,21 @@ type ContentRelationshipFieldWithData<
   >;
 }[Exclude<TCustomType[number], string>["id"]];
 
+/**
+ * Item in *Info → Project Order*
+ */
+export interface AboutDocumentDataProjectOrderItem {
+  /**
+   * Project field in *Info → Project Order*
+   *
+   * - **Field Type**: Content Relationship
+   * - **Placeholder**: *None*
+   * - **API ID Path**: about.project_order[].project
+   * - **Documentation**: https://prismic.io/docs/fields/content-relationship
+   */
+  project: prismic.ContentRelationshipField<"project">;
+}
+
 type AboutDocumentDataSlicesSlice = never;
 
 /**
@@ -85,6 +100,30 @@ interface AboutDocumentData {
    * - **Documentation**: https://prismic.io/docs/fields/rich-text
    */
   information: prismic.RichTextField;
+
+  /**
+   * Featured Project field in *Info*
+   *
+   * - **Field Type**: Content Relationship
+   * - **Placeholder**: *None*
+   * - **API ID Path**: about.featured_project
+   * - **Tab**: Main
+   * - **Documentation**: https://prismic.io/docs/fields/content-relationship
+   */
+  featured_project: prismic.ContentRelationshipField<"project">;
+
+  /**
+   * Project Order field in *Info*
+   *
+   * - **Field Type**: Group
+   * - **Placeholder**: *None*
+   * - **API ID Path**: about.project_order[]
+   * - **Tab**: Main
+   * - **Documentation**: https://prismic.io/docs/fields/repeatable-group
+   */
+  project_order: prismic.GroupField<
+    Simplify<AboutDocumentDataProjectOrderItem>
+  >;
 
   /**
    * Slice Zone field in *Info*
@@ -311,6 +350,7 @@ declare module "@prismicio/client" {
     export type {
       AboutDocument,
       AboutDocumentData,
+      AboutDocumentDataProjectOrderItem,
       AboutDocumentDataSlicesSlice,
       ProjectDocument,
       ProjectDocumentData,
