@@ -6,7 +6,7 @@
     //-   @click="dropdownOpen = false"
     //- )
     nav.fixed.right-0.top-1x2.-translate-y-1x2.z-2000.border-stone-700.border.right-0.w-11x12.opacity-80(
-        class="bg-black-40 backdrop-blur-sm"
+        class="bg-black-40"
       )
       .absolute.bottom-full.left-0.w-full
         slot
@@ -36,7 +36,7 @@
           .absolute.-left-px.-right-px.bottom-full(
             v-if="dropdownOpen"
           )
-            ul.list-none.backdrop-blur-sm.border.border-stone-700.divide-y.divide-stone-700(
+            ul.list-none.border.border-stone-700.divide-y.divide-stone-700(
               class="bg-black-80"
             )
               li(
@@ -54,7 +54,7 @@
           .absolute.-left-px.-right-px.top-full(
             v-if="dropdownOpen"
           )
-            ul.list-none.backdrop-blur-sm.border.border-stone-700.divide-y.divide-stone-700(
+            ul.list-none.border.border-stone-700.divide-y.divide-stone-700(
               class="bg-black-80"
             )
               li(
