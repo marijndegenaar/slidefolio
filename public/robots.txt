@@ -1,2 +1,4 @@
 User-Agent: *
-Disallow:
+Disallow: /slice-simulator
+
+Sitemap: https://andreabelosi.com/sitemap.xml

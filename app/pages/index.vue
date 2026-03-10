@@ -22,11 +22,9 @@
 </template>
 
 <script setup lang="ts">
-// import { createClient } from '@prismicio/client'
-// import { computed, ref, watch } from 'vue'
-// import { useAsyncData, useNuxtApp, useRuntimeConfig } from '#app'
-// import type { ProjectDocument, AboutDocument } from '~~/prismicio-types'
-// import type { Query } from '@prismicio/client'
+const DEFAULT_TITLE = 'Andrea Belosi - Architecture & Scenography'
+const DEFAULT_DESCRIPTION = 'Portfolio of Andrea Belosi — architecture and scenography projects.'
+const SITE_URL = 'https://andreabelosi.com'
 
 const nuxtApp = useNuxtApp()
 const config = useRuntimeConfig()
@@ -103,4 +101,47 @@ function onSlideshowAdvance() {
 function onSelectProject(project?: ProjectDocument) {
   selectedUid.value = project?.uid ?? null
 }
+
+const seoTitle = computed(() => about.value?.data?.meta_title || DEFAULT_TITLE)
+const seoDescription = computed(() => about.value?.data?.meta_description || DEFAULT_DESCRIPTION)
+const seoImage = computed(() => about.value?.data?.meta_image?.url ?? undefined)
+
+useSeoMeta({
+  title: seoTitle,
+  description: seoDescription,
+  ogTitle: seoTitle,
+  ogDescription: seoDescription,
+  ogImage: seoImage,
+  ogUrl: SITE_URL,
+  ogType: 'website',
+  ogSiteName: DEFAULT_TITLE,
+  twitterCard: 'summary_large_image',
+  twitterTitle: seoTitle,
+  twitterDescription: seoDescription,
+  twitterImage: seoImage,
+})
+
+useHead({
+  script: [
+    {
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@graph': [
+          {
+            '@type': 'WebSite',
+            name: DEFAULT_TITLE,
+            url: SITE_URL,
+          },
+          {
+            '@type': 'Person',
+            name: 'Andrea Belosi',
+            url: SITE_URL,
+            jobTitle: 'Architect & Scenographer',
+          },
+        ],
+      }),
+    },
+  ],
+})
 </script>

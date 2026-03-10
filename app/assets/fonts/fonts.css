@@ -4,16 +4,19 @@
     src: url('./a-thin.ttf') format('truetype');
     font-style: normal;
     font-weight: 100;
+    font-display: swap;
 }
 @font-face {
     font-family: 'A';
     src: url('./a-light.ttf') format('truetype');
     font-style: normal;
     font-weight: 200;
+    font-display: swap;
 }
 @font-face {
     font-family: 'A';
     src: url('./a-reg.ttf') format('truetype');
     font-style: normal;
     font-weight: 500;
+    font-display: swap;
 }
