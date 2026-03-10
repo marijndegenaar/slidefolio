@@ -6,6 +6,8 @@ div.fixed.inset-0.z-0.bg-neutral-800(
   @mousemove="onMouseMove"
   @mouseleave="cursorVisible = false"
   @mouseenter="cursorVisible = true"
+  @touchstart.passive="onTouchStart"
+  @touchend.passive="onTouchEnd"
   @keydown.right.prevent="next"
   @keydown.left.prevent="prev"
   @keydown.space.prevent="next"
@@ -52,6 +54,15 @@ const cursorX = ref(0)
 const cursorY = ref(0)
 const cursorOnLeft = ref(false)
 const cursorVisible = ref(false)
+const isRotated = ref(false)
+
+const ROTATION_QUERY = '(max-width: 768px) and (orientation: portrait)'
+
+onMounted(() => {
+  const mq = window.matchMedia(ROTATION_QUERY)
+  isRotated.value = mq.matches
+  mq.addEventListener('change', (e) => { isRotated.value = e.matches })
+})
 
 function toggleObjectFit() {
   objectFit.value = objectFit.value === 'cover' ? 'contain' : 'cover'
@@ -68,12 +79,42 @@ function onMouseMove(e: MouseEvent) {
   if (el) cursorOnLeft.value = e.clientX < el.getBoundingClientRect().width / 2
 }
 
+let touchStartPos = 0
+const SWIPE_THRESHOLD = 30
+
+function onTouchStart(e: TouchEvent) {
+  const t = e.changedTouches.item(0)
+  if (!t) return
+  touchStartPos = isRotated.value ? t.clientY : t.clientX
+}
+
+function onTouchEnd(e: TouchEvent) {
+  const t = e.changedTouches.item(0)
+  if (!t) return
+  const endPos = isRotated.value ? t.clientY : t.clientX
+  const delta = endPos - touchStartPos
+  if (Math.abs(delta) < SWIPE_THRESHOLD) return
+  if (isRotated.value) {
+    if (delta > 0) next()
+    else prev()
+  } else {
+    if (delta < 0) next()
+    else prev()
+  }
+}
+
 function onClick(e: MouseEvent) {
   const el = containerRef.value
   if (!el || !props.slideshow.length) return
-  const midpoint = el.getBoundingClientRect().width / 2
-  if (e.clientX < midpoint) prev()
-  else next()
+  if (isRotated.value) {
+    const midpoint = window.innerHeight / 2
+    if (e.clientY < midpoint) prev()
+    else next()
+  } else {
+    const midpoint = el.getBoundingClientRect().width / 2
+    if (e.clientX < midpoint) prev()
+    else next()
+  }
 }
 
 function next() {
