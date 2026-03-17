@@ -26,7 +26,7 @@ div.fixed.inset-0.z-0.bg-neutral-800(
       )
       p(
         v-if="slide.caption"
-        class="absolute bottom-4 left-4 right-4 opacity-60 text-sm"
+        class="absolute bottom-4 left-4 right-4 opacity-60 text-sm w-1x2 md_w-2x3"
       ) {{ slide.caption }}
     span.nav-cursor(
       :class="{ 'is-visible': cursorVisible }"
