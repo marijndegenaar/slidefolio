@@ -22,11 +22,12 @@ div.fixed.inset-0.z-0.bg-neutral-800(
       PrismicImage(
         :field="slide.image"
         :loading="i === currentIndex ? 'eager' : 'lazy'"
+        :imgix-params="mobileImgixParams"
         :class="objectFit === 'cover' ? 'w-full h-full object-cover' : 'w-full h-full object-contain'"
       )
       p(
         v-if="slide.caption"
-        class="absolute bottom-4 left-4 right-4 opacity-60 text-sm w-1x2 md_w-2x3"
+        class="absolute bottom-4 left-4 right-4 opacity-60 text-sm w-2x3"
       ) {{ slide.caption }}
     span.nav-cursor(
       :class="{ 'is-visible': cursorVisible }"
@@ -55,13 +56,28 @@ const cursorY = ref(0)
 const cursorOnLeft = ref(false)
 const cursorVisible = ref(false)
 const isRotated = ref(false)
+const isMobile = ref(false)
 
 const ROTATION_QUERY = '(max-width: 768px) and (orientation: portrait)'
+const MOBILE_QUERY = '(max-width: 768px)'
+
+// Avoid first-paint with the wrong compression on mobile.
+if (typeof window !== 'undefined') {
+  const mqMobile = window.matchMedia(MOBILE_QUERY)
+  isMobile.value = mqMobile.matches
+  mqMobile.addEventListener('change', (e: MediaQueryListEvent) => { isMobile.value = e.matches })
+}
 
 onMounted(() => {
   const mq = window.matchMedia(ROTATION_QUERY)
   isRotated.value = mq.matches
   mq.addEventListener('change', (e) => { isRotated.value = e.matches })
+})
+
+const mobileImgixParams = computed(() => {
+  if (!isMobile.value) return undefined
+  // Remove Imgix `compress` while keeping modern formats.
+  return { auto: ['format'], q: 90 }
 })
 
 function toggleObjectFit() {
