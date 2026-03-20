@@ -5,7 +5,7 @@ div.fixed.inset-0.z-0.bg-neutral-800(
   @click="onClick"
   @mousemove="onMouseMove"
   @mouseleave="cursorVisible = false"
-  @mouseenter="cursorVisible = true"
+  @mouseenter="onMouseEnter"
   @touchstart.passive="onTouchStart"
   @touchend.passive="onTouchEnd"
   @keydown.right.prevent="next"
@@ -57,15 +57,23 @@ const cursorOnLeft = ref(false)
 const cursorVisible = ref(false)
 const isRotated = ref(false)
 const isMobile = ref(false)
+const isTouchLike = ref(false)
 
 const ROTATION_QUERY = '(max-width: 768px) and (orientation: portrait)'
 const MOBILE_QUERY = '(max-width: 768px)'
+const TOUCH_LIKE_QUERY = '(hover: none), (pointer: coarse)'
 
 // Avoid first-paint with the wrong compression on mobile.
 if (typeof window !== 'undefined') {
   const mqMobile = window.matchMedia(MOBILE_QUERY)
   isMobile.value = mqMobile.matches
   mqMobile.addEventListener('change', (e: MediaQueryListEvent) => { isMobile.value = e.matches })
+
+  const mqTouchLike = window.matchMedia(TOUCH_LIKE_QUERY)
+  isTouchLike.value = mqTouchLike.matches
+  mqTouchLike.addEventListener('change', (e: MediaQueryListEvent) => {
+    isTouchLike.value = e.matches
+  })
 }
 
 onMounted(() => {
@@ -89,10 +97,18 @@ watch(() => props.slideshow, () => {
 }, { immediate: true })
 
 function onMouseMove(e: MouseEvent) {
+  if (isTouchLike.value) return
   cursorX.value = e.clientX
   cursorY.value = e.clientY
   const el = containerRef.value
   if (el) cursorOnLeft.value = e.clientX < el.getBoundingClientRect().width / 2
+}
+
+function onMouseEnter() {
+  // On touch devices some browsers still synthesize hover/mouse events.
+  // Avoid turning the arrow overlay on in that case.
+  if (isTouchLike.value) return
+  cursorVisible.value = true
 }
 
 let touchStartPos = 0
@@ -101,12 +117,14 @@ const SWIPE_THRESHOLD = 30
 function onTouchStart(e: TouchEvent) {
   const t = e.changedTouches.item(0)
   if (!t) return
+  cursorVisible.value = false
   touchStartPos = isRotated.value ? t.clientY : t.clientX
 }
 
 function onTouchEnd(e: TouchEvent) {
   const t = e.changedTouches.item(0)
   if (!t) return
+  cursorVisible.value = false
   const endPos = isRotated.value ? t.clientY : t.clientX
   const delta = endPos - touchStartPos
   if (Math.abs(delta) < SWIPE_THRESHOLD) return
@@ -163,4 +181,15 @@ div.fixed
 
 .nav-cursor.is-visible
   opacity: 0.5
+
+// On touch/coarse-pointer devices, don't show the custom "arrow cursor".
+// Some mobile browsers still synthesize hover/mouse events, which can make
+// the cursor appear even without a pointing device.
+@media (hover: none), (pointer: coarse), (max-width: 768px)
+  .nav-cursor
+    display: none !important
+
+  // Be explicit: ensure the native cursor arrow stays hidden on mobile too.
+  div.fixed
+    cursor: none !important
 </style>
