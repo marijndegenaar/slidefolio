@@ -63,23 +63,20 @@ const ROTATION_QUERY = '(max-width: 768px) and (orientation: portrait)'
 const MOBILE_QUERY = '(max-width: 768px)'
 const TOUCH_LIKE_QUERY = '(hover: none), (pointer: coarse)'
 
-// Avoid first-paint with the wrong compression on mobile.
-if (typeof window !== 'undefined') {
+onMounted(() => {
+  const mq = window.matchMedia(ROTATION_QUERY)
+  isRotated.value = mq.matches
+  mq.addEventListener('change', (e) => { isRotated.value = e.matches })
+
+  // Important: keep initial (SSR + first hydration) render deterministic.
+  // Only decide viewport-dependent image params after hydration.
   const mqMobile = window.matchMedia(MOBILE_QUERY)
   isMobile.value = mqMobile.matches
   mqMobile.addEventListener('change', (e: MediaQueryListEvent) => { isMobile.value = e.matches })
 
   const mqTouchLike = window.matchMedia(TOUCH_LIKE_QUERY)
   isTouchLike.value = mqTouchLike.matches
-  mqTouchLike.addEventListener('change', (e: MediaQueryListEvent) => {
-    isTouchLike.value = e.matches
-  })
-}
-
-onMounted(() => {
-  const mq = window.matchMedia(ROTATION_QUERY)
-  isRotated.value = mq.matches
-  mq.addEventListener('change', (e) => { isRotated.value = e.matches })
+  mqTouchLike.addEventListener('change', (e: MediaQueryListEvent) => { isTouchLike.value = e.matches })
 })
 
 const mobileImgixParams = computed(() => {
