@@ -11,8 +11,8 @@
       .absolute.bottom-full.left-0.w-full
         slot
       .title-swap.hidden.md_block
-        span.title-swap__label ARCHITECTURE & SCENOGRAPHY
-        span.title-swap__label.title-swap__label--alt ANDREA BELOSI
+        span.title-swap__label.uppercase Your site's title
+        span.title-swap__label.title-swap__label--alt Artist name
       .flex.items-center.gap-8
         .flex.items-center.gap-6.flex-shrink-0
           button.hover_opacity-80.px-3(

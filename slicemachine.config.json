@@ -1,6 +1,7 @@
 {
-  "repositoryName": "belosi",
+  "repositoryName": "slidefolio",
   "adapter": "@slicemachine/adapter-nuxt",
   "libraries": ["./app/slices"],
+  "apiEndpoint": "https://slidefolio.cdn.prismic.io/api/v2",
   "localSliceSimulatorURL": "http://localhost:3000/slice-simulator"
 }

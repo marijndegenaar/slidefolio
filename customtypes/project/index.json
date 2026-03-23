@@ -60,6 +60,17 @@
                 "label": "Caption",
                 "placeholder": ""
               }
+            },
+            "media": {
+              "type": "Link",
+              "config": {
+                "label": "Media",
+                "placeholder": "",
+                "select": null,
+                "allowTargetBlank": true,
+                "allowText": true,
+                "repeat": false
+              }
             }
           }
         }

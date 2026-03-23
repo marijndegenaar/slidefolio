@@ -35,7 +35,7 @@ export default defineNuxtConfig({
   },
 
   prismic: {
-    endpoint: 'https://belosi.cdn.prismic.io/api/v2',
+    endpoint: 'https://slidefolio.cdn.prismic.io/api/v2',
     toolbar: false,
     preview: false,
   },

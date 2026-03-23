@@ -22,9 +22,9 @@
 </template>
 
 <script setup lang="ts">
-const DEFAULT_TITLE = 'Andrea Belosi - Architecture & Scenography'
-const DEFAULT_DESCRIPTION = 'Portfolio of Andrea Belosi — architecture and scenography projects.'
-const SITE_URL = 'https://andreabelosi.com'
+const DEFAULT_TITLE = 'The title of your website'
+const DEFAULT_DESCRIPTION = 'Description goes here'
+const SITE_URL = 'https://website.com'
 
 const nuxtApp = useNuxtApp()
 const config = useRuntimeConfig()

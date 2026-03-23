@@ -203,6 +203,16 @@ export interface ProjectDocumentDataSlideshowItem {
    * - **Documentation**: https://prismic.io/docs/fields/text
    */
   caption: prismic.KeyTextField;
+
+  /**
+   * Media field in *Project → Slideshow*
+   *
+   * - **Field Type**: Link
+   * - **Placeholder**: *None*
+   * - **API ID Path**: project.slideshow[].media
+   * - **Documentation**: https://prismic.io/docs/fields/link
+   */
+  media: prismic.LinkField<string, string, unknown, prismic.FieldState, never>;
 }
 
 type ProjectDocumentDataSlicesSlice = never;

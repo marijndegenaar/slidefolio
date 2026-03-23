@@ -1,41 +1,77 @@
 <template lang="pug">
-div.fixed.inset-0.z-0.bg-neutral-800(
-  ref="containerRef"
-  tabindex="0"
-  @click="onClick"
-  @mousemove="onMouseMove"
-  @mouseleave="cursorVisible = false"
-  @mouseenter="onMouseEnter"
-  @touchstart.passive="onTouchStart"
-  @touchend.passive="onTouchEnd"
-  @keydown.right.prevent="next"
-  @keydown.left.prevent="prev"
-  @keydown.space.prevent="next"
-  @keydown.enter.prevent="next"
-)
-  template(v-if="slideshow.length")
-    div.absolute.inset-0(
-      v-for="(slide, i) in slideshow"
-      :key="i"
-      :class="{ 'opacity-100 z-10': i === currentIndex, 'opacity-0 pointer-events-none': i !== currentIndex }"
-    )
-      PrismicImage(
-        :field="slide.image"
-        :loading="i === currentIndex ? 'eager' : 'lazy'"
-        :imgix-params="mobileImgixParams"
-        :class="objectFit === 'cover' ? 'w-full h-full object-cover' : 'w-full h-full object-contain'"
+  div.fixed.inset-0.z-0.bg-neutral-800(
+    ref="containerRef"
+    tabindex="0"
+    @click="onClick"
+    @mousemove="onMouseMove"
+    @mouseleave="cursorVisible = false"
+    @mouseenter="onMouseEnter"
+    @touchstart.passive="onTouchStart"
+    @touchend.passive="onTouchEnd"
+    @keydown.right.prevent="next"
+    @keydown.left.prevent="prev"
+    @keydown.space.prevent="next"
+    @keydown.enter.prevent="next"
+  )
+    template(v-if="slideshow.length")
+      div.absolute.inset-0(
+        v-for="(slide, i) in slideshow"
+        :key="i"
+        :class="{ 'opacity-100 z-10': i === currentIndex, 'opacity-0 pointer-events-none': i !== currentIndex }"
       )
-      p(
-        v-if="slide.caption"
-        class="absolute bottom-4 left-4 right-4 opacity-60 text-sm w-2x3"
-      ) {{ slide.caption }}
-    span.nav-cursor(
-      :class="{ 'is-visible': cursorVisible }"
-      :style="{ left: cursorX + 'px', top: cursorY + 'px' }"
-    ) {{ cursorOnLeft ? '&#8592;' : '&#8594;' }}
-  div.flex.items-center.justify-center(v-else)
-    p No slides
-</template>
+        //- Vimeo
+        template(v-if="getVideoType(slide) === 'vimeo'")
+          div.relative.w-full.h-full
+            iframe.w-full.h-full(
+              :src="vimeoEmbedUrl(slide.media.url)"
+              frameborder="0"
+              allow="autoplay; fullscreen"
+            )
+            div.absolute.inset-0
+  
+        //- YouTube
+        template(v-else-if="getVideoType(slide) === 'youtube'")
+          iframe.w-full.h-full(
+            :src="youtubeEmbedUrl(slide.media.url)"
+            frameborder="0"
+            allow="autoplay; fullscreen"
+            allowfullscreen
+          )
+  
+        //- Direct video file (Prismic media library)
+        template(v-else-if="getVideoType(slide) === 'file'")
+          video.w-full.h-full(
+            :src="slide.media.url"
+            autoplay
+            muted
+            loop
+            playsinline
+            :class="objectFit === 'cover' ? 'object-cover' : 'object-contain'"
+            :key="i === currentIndex ? 'active' : 'inactive'"
+          )
+  
+        //- Fallback: image
+        template(v-else)
+          PrismicImage(
+            :field="slide.image"
+            :loading="i === currentIndex ? 'eager' : 'lazy'"
+            :imgix-params="mobileImgixParams"
+            :class="objectFit === 'cover' ? 'w-full h-full object-cover' : 'w-full h-full object-contain'"
+          )
+  
+        p(
+          v-if="slide.caption"
+          class="absolute bottom-4 left-4 right-4 opacity-60 text-sm w-2x3"
+        ) {{ slide.caption }}
+  
+      span.nav-cursor(
+        :class="{ 'is-visible': cursorVisible }"
+        :style="{ left: cursorX + 'px', top: cursorY + 'px' }"
+      ) {{ cursorOnLeft ? '&#8592;' : '&#8594;' }}
+  
+    div.flex.items-center.justify-center(v-else)
+      p No slides
+  </template>
 
 <script setup lang="ts">
 import type { ProjectDocumentDataSlideshowItem } from '~~/prismicio-types'
@@ -158,6 +194,33 @@ function prev() {
   if (!props.slideshow.length) return
   currentIndex.value = (currentIndex.value - 1 + props.slideshow.length) % props.slideshow.length
   emit('advance')
+}
+
+// --- Video helpers ---
+
+type VideoType = 'vimeo' | 'youtube' | 'file' | null
+
+function getVideoType(slide: ProjectDocumentDataSlideshowItem): VideoType {
+  const url = slide.media?.url
+  if (!url) return null
+  if (/vimeo\.com/i.test(url)) return 'vimeo'
+  if (/youtu\.be|youtube\.com/i.test(url)) return 'youtube'
+  // Treat any other filled link as a direct file
+  return 'file'
+}
+
+function vimeoEmbedUrl(url: string): string {
+  // Handles https://vimeo.com/123456789 and https://vimeo.com/channels/x/123456789
+  const match = url.match(/vimeo\.com\/(?:.*\/)?(\d+)/)
+  const id = match?.[1] ?? ''
+  return `https://player.vimeo.com/video/${id}?autoplay=1&muted=1&loop=1&background=1`
+}
+
+function youtubeEmbedUrl(url: string): string {
+  // Handles youtu.be/ID and youtube.com/watch?v=ID
+  const match = url.match(/(?:youtu\.be\/|[?&]v=)([\w-]{11})/)
+  const id = match?.[1] ?? ''
+  return `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&loop=1&playlist=${id}&controls=0`
 }
 </script>
 
