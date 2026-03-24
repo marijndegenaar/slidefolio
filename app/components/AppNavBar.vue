@@ -13,11 +13,12 @@
   )
     .absolute.bottom-full.left-0.w-full
       slot
-  
     ul.list-none.w-full.px-2(
       ref="dropdownWrapRef"
       @mouseenter="onMouseEnter"
       @mouseleave="onMouseLeave"
+      :aria-hidden="infoOpen"
+      :aria-expanded="infoOpen"
     )
       li(
         v-for="project in projects"
@@ -27,6 +28,7 @@
           type="button"
           :class="getItemClasses(project)"
           @click.stop="onItemClick(project)"
+          v-show="!infoOpen"
         )
           strong {{ project.data.title ?? 'Untitled' }}
           template(v-if="projectMeta(project)") , {{ projectMeta(project) }}
@@ -120,6 +122,6 @@
   button
     transition: opacity 0.3s ease, font-variation-settings 0.5s ease
   
-  button:hover, button:focus
+  button:hover
     font-variation-settings: "wght" 10
   </style>

@@ -3,6 +3,7 @@
     AppSlideshow(
       :key="selectedProject?.uid ?? 'none'"
       :slideshow="slideshowItems"
+      :info-open="infoOpen"
       @advance="onSlideshowAdvance"
     )
     AppNavBar(

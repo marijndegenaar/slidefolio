@@ -1,5 +1,5 @@
 <template lang="pug">
-.fixed.overflow-y-auto.px-2.py-1.w-full.top-12.text-3xl.text-right(
+.fixed.overflow-y-none.px-2.py-1.w-full.top-12.text-xl.md_text-3xl.text-right(
   ref="panelRef"
   role="dialog"
   aria-label="Info"
@@ -35,6 +35,7 @@ onMounted(() => {
 </script>
 <style lang="sass" scoped>
 :deep(p)
+  margin-bottom: .5em
   a:link, a:visited
     opacity: .8
   a:hover, a:focus

@@ -1,5 +1,5 @@
 <template lang="pug">
-  div.fixed.inset-0.z-0.bg-neutral-800.overflow-hidden(
+  .slideshow.fixed.inset-0.z-0.bg-neutral-800.overflow-hidden(
     ref="containerRef"
     tabindex="0"
     @click="onClick"
@@ -66,18 +66,20 @@
           )
   
         p(
-          v-if="slide.caption"
+          v-if="slide.caption && !infoOpen"
           class="absolute bottom-2 left-2 text-sm w-2x3 mix-blend-difference z-20"
         ) {{ slide.caption }}
   
       span.nav-cursor(
+        v-show="!infoOpen"
         :class="{ 'is-visible': cursorVisible }"
-        :style="{ left: cursorX + 'px', top: cursorY + 'px' }"
+        :style="{ left: cursorX  + 'px', top: cursorY + 'px' }"
       ) {{ cursorOnLeft ? '&#8592;' : '&#8594;' }}
 
       //- Global Mute/Unmute Button
       button.absolute.bottom-4.right-4.z-50.text-2xl.drop-shadow-md.transition-transform.hover_scale-110(
         v-if="currentIsVideo"
+        v-show="!infoOpen"
         @click.stop="toggleMute"
       )
         | {{ isMuted ? '🔇' : '🔊' }}
@@ -92,6 +94,7 @@ import type { ProjectDocumentDataSlideshowItem } from '~~/prismicio-types'
 
 const props = defineProps<{
   slideshow: ProjectDocumentDataSlideshowItem[]
+  infoOpen: boolean
 }>()
 
 const emit = defineEmits<{
@@ -108,6 +111,7 @@ const cursorVisible = ref(false)
 const isRotated = ref(false)
 const isMobile = ref(false)
 const isTouchLike = ref(false)
+
 
 // Audio specific refs
 const isMuted = ref(true)
@@ -281,7 +285,7 @@ function applyMuteState(index: number) {
 </script>
 
 <style scoped lang="sass">
-div.fixed
+.slideshow
   cursor: none
 
 /* CSS trick to make 16:9 iframes act like object-fit: cover */
