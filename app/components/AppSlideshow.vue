@@ -61,7 +61,7 @@
   
         p(
           v-if="slide.caption"
-          class="absolute bottom-4 left-4 right-4 opacity-60 text-sm w-2x3"
+          class="absolute bottom-2 left-2 text-sm w-2x3 mix-blend-difference"
         ) {{ slide.caption }}
   
       span.nav-cursor(

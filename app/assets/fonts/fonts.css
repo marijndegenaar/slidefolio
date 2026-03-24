@@ -20,3 +20,10 @@
     font-weight: 500;
     font-display: swap;
 }
+@font-face {
+    font-family: 'G';
+    src: url('./g.ttf') format('truetype');
+    font-style: normal;
+    font-weight: normal;
+    font-display: swap;
+}

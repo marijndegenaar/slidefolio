@@ -1,18 +1,12 @@
 <template lang="pug">
-div.relative.overflow-y-auto.px-2.py-1.w-1x4.md_w-2x12.border.border-stone-700.-translate-x-px(
+.fixed.overflow-y-auto.px-2.py-1.w-full.top-12.text-3xl.text-right(
   ref="panelRef"
   role="dialog"
   aria-label="Info"
   tabindex="-1"
-  class="bg-black-80 backdrop-blur-sm"
+  class=""
   @keydown.escape="emit('close')"
 )
-  button.absolute.right-2.top-1.opacity-80(
-    type="button"
-    class="hover_opacity-100"
-    aria-label="Close"
-    @click="emit('close')"
-  ) ×
   div(v-if="hasContent")
     PrismicRichText(:field="field")
   p(v-else) No content

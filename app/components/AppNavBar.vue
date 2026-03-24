@@ -1,157 +1,125 @@
 <template lang="pug">
-  div
-    //- .fixed.inset-0.z-10(
-    //-   v-if="dropdownOpen"
-    //-   aria-hidden="true"
-    //-   @click="dropdownOpen = false"
-    //- )
-    nav.fixed.right-0.top-1x2.-translate-y-1x2.z-2000.border-stone-700.border.right-0.w-11x12.opacity-80(
-        class="bg-black-40"
+  .header.fixed.flex.items-start.justify-between.w-full.mix-blend-difference.p-2
+      img.w-1x12.logo(src="@/assets/img/question.png" alt="Info")
+      button(
+        type="button"
+        @click="emit('toggle-info')"
+
+        :aria-pressed="infoOpen"
+      ) INFO
+  
+  nav.fixed.inset-0.z-2000.flex.items-center.pointer-events-none.mix-blend-difference(
+    ref="navRef"
+  )
+    .absolute.bottom-full.left-0.w-full
+      slot
+  
+    ul.list-none.w-full.px-2(
+      ref="dropdownWrapRef"
+      @mouseenter="onMouseEnter"
+      @mouseleave="onMouseLeave"
+    )
+      li(
+        v-for="project in projects"
+        :key="project.uid"
       )
-      .absolute.bottom-full.left-0.w-full
-        slot
-      .title-swap.hidden.md_block
-        span.title-swap__label.uppercase Your site's title
-        span.title-swap__label.title-swap__label--alt Artist name
-      .flex.items-center.gap-8
-        .flex.items-center.gap-6.flex-shrink-0
-          button.hover_opacity-80.px-3(
-            type="button"
-            @click="emit('toggle-info')"
-          ) INFO
-        .flex-1
-        .relative.flex-shrink-0(ref="dropdownWrapRef").w-1x2.md_w-1x3.border-l.border-stone-700.px-2.md_py-0
-          button.flex.items-center.hover_opacity-80.text-left(
-            type="button"
-            :aria-expanded="dropdownOpen"
-            aria-haspopup="true"
-            @click.stop="dropdownOpen = !dropdownOpen"
-          )
-            span(:class="{ 'invisible': dropdownOpen }")
-              strong {{ selectedProject?.data.title ?? 'Select project' }}
-              template(v-if="projectMeta(selectedProject)") , {{ projectMeta(selectedProject) }}
-            span(
-              :class="dropdownOpen ? 'rotate-180' : ''"
-            ) 
-          .absolute.-left-px.-right-px.bottom-full(
-            v-if="dropdownOpen"
-          )
-            ul.list-none.border.border-stone-700.divide-y.divide-stone-700(
-              class="bg-black-80"
-            )
-              li(
-                v-for="project in topProjects"
-                :key="project.uid"
-              )
-                button.w-full.text-left.px-2.py-1.md_py-0(
-                  type="button"
-                  class="hover_bg-white-10"
-                  :class="{ 'bg-white-10': project.uid === selectedUid }"
-                  @click="onSelect(project)"
-                )
-                  strong {{ project.data.title ?? 'Untitled' }}
-                  template(v-if="projectMeta(project)") , {{ projectMeta(project) }}
-          .absolute.-left-px.-right-px.top-full(
-            v-if="dropdownOpen"
-          )
-            ul.list-none.border.border-stone-700.divide-y.divide-stone-700(
-              class="bg-black-80"
-            )
-              li(
-                v-for="project in bottomProjects"
-                :key="project.uid"
-              )
-                button.w-full.text-left.px-2.py-1.md_py-0(
-                  type="button"
-                  class="hover_bg-white-10"
-                  :class="{ 'bg-white-10': project.uid === selectedUid }"
-                  @click="onSelect(project)"
-                )
-                  strong {{ project.data.title ?? 'Untitled' }}
-                  template(v-if="projectMeta(project)") , {{ projectMeta(project) }}
-</template>
-
-<script setup lang="ts">
-import type { ProjectDocument } from '~~/prismicio-types'
-
-const props = defineProps<{
-  projects: ProjectDocument[]
-  selectedUid: string | null
-  infoOpen: boolean
-  closeMenus: number
-}>()
-
-const emit = defineEmits<{
-  'select-project': [project: ProjectDocument]
-  'toggle-info': []
-}>()
-
-const dropdownOpen = ref(false)
-const dropdownWrapRef = ref<HTMLElement | null>(null)
-
-watch(() => props.closeMenus, () => {
-  dropdownOpen.value = false
-})
-
-const topProjects = computed(() => {
-  const n = props.projects.length
-  return props.projects.slice(0, Math.ceil(n / 2))
-})
-
-const bottomProjects = computed(() => {
-  const n = props.projects.length
-  return props.projects.slice(Math.ceil(n / 2))
-})
-
-const selectedProject = computed(() =>
-  props.projects.find(p => p.uid === props.selectedUid) ?? props.projects[0] ?? null,
-)
-
-function projectMeta(project: ProjectDocument | null) {
-  if (!project) return ''
-  const d = project.data
-  const parts: string[] = []
-  if (d.year) parts.push(d.year)
-  if (d.location) parts.push(d.location)
-  if (d.project_type) parts.push(d.project_type)
-  return parts.join(', ')
-}
-
-function onSelect(project: ProjectDocument) {
-  dropdownOpen.value = false
-  emit('select-project', project)
-}
-</script>
-
-<style scoped>
-.title-swap {
-  position: absolute;
-  left: calc(50vw - 100vw / 12);
-  top: 50%;
-  transform: translate(-50%, -50%);
-  white-space: nowrap;
-  pointer-events: auto;
-  z-index: 1;
-}
-
-.title-swap__label {
-  transition: opacity 0.2s ease;
-}
-
-.title-swap__label--alt {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-}
-
-.title-swap:hover .title-swap__label:not(.title-swap__label--alt) {
-  opacity: 0;
-}
-
-.title-swap:hover .title-swap__label--alt {
-  opacity: 1;
-}
-</style>
+        button.w-full.text-left.text-2xl.py-1.md_py-0(
+          type="button"
+          :class="getItemClasses(project)"
+          @click.stop="onItemClick(project)"
+        )
+          strong {{ project.data.title ?? 'Untitled' }}
+          template(v-if="projectMeta(project)") , {{ projectMeta(project) }}
+  </template>
+  
+  <script setup lang="ts">
+  const props = defineProps<{
+    projects: ProjectDocument[]
+    selectedUid: string | null
+    infoOpen: boolean
+    closeMenus: number
+  }>()
+  
+  const emit = defineEmits<{
+    'select-project': [project: ProjectDocument]
+    'toggle-info': []
+  }>()
+  
+  const dropdownOpen = ref(false)
+  const dropdownWrapRef = ref<HTMLElement | null>(null)
+  const navRef = ref<HTMLElement | null>(null)
+  const isTouchLike = ref(false)
+  
+  onMounted(() => {
+    const mq = window.matchMedia('(hover: none), (pointer: coarse)')
+    isTouchLike.value = mq.matches
+    mq.addEventListener('change', (e) => { isTouchLike.value = e.matches })
+  })
+  
+  watch(() => props.closeMenus, () => {
+    dropdownOpen.value = false
+  })
+  
+  const selectedProject = computed(() =>
+    props.projects.find(p => p.uid === props.selectedUid) ?? props.projects[0] ?? null,
+  )
+  
+  function getItemClasses(project: ProjectDocument) {
+    const isActive = project.uid === selectedProject.value?.uid
+    return {
+      'opacity-100 pointer-events-auto': isActive || dropdownOpen.value,
+      'opacity-0 pointer-events-none': !isActive && !dropdownOpen.value,
+    }
+  }
+  
+  function projectMeta(project: ProjectDocument | null) {
+    if (!project) return ''
+    const d = project.data
+    const parts: string[] = []
+    if (d.year) parts.push(d.year)
+    if (d.location) parts.push(d.location)
+    if (d.project_type) parts.push(d.project_type)
+    return parts.join(', ')
+  }
+  
+  function onMouseEnter() {
+    if (isTouchLike.value) return
+    dropdownOpen.value = true
+  }
+  
+  function onMouseLeave() {
+    if (isTouchLike.value) return
+    dropdownOpen.value = false
+  }
+  
+  function onItemClick(project: ProjectDocument) {
+    if (isTouchLike.value) {
+      if (!dropdownOpen.value) {
+        dropdownOpen.value = true
+      } else {
+        dropdownOpen.value = false
+        emit('select-project', project)
+      }
+    } else {
+      emit('select-project', project)
+    }
+  }
+  
+  function onClickOutside(e: MouseEvent) {
+    if (!dropdownOpen.value || !isTouchLike.value) return
+    if (dropdownWrapRef.value && !dropdownWrapRef.value.contains(e.target as Node)) {
+      dropdownOpen.value = false
+    }
+  }
+  
+  onMounted(() => document.addEventListener('click', onClickOutside))
+  onUnmounted(() => document.removeEventListener('click', onClickOutside))
+  </script>
+  
+  <style scoped lang="sass">
+  button
+    transition: opacity 0.3s ease, font-variation-settings 0.5s ease
+  
+  button:hover, button:focus
+    font-variation-settings: "wght" 10
+  </style>
