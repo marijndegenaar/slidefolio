@@ -11,9 +11,9 @@
   nav.fixed.inset-0.z-2000.flex.items-center.pointer-events-none.mix-blend-difference(
     ref="navRef"
   )
-    .absolute.bottom-full.left-0.w-full
+    .absolute.bottom-full.left-0
       slot
-    ul.list-none.w-full.px-2(
+    ul.list-none.px-2(
       ref="dropdownWrapRef"
       @mouseenter="onMouseEnter"
       @mouseleave="onMouseLeave"
@@ -24,7 +24,7 @@
         v-for="project in projects"
         :key="project.uid"
       )
-        button.w-full.text-left.text-2xl.py-1.md_py-0(
+        button.text-2xl.py-1.md_py-0(
           type="button"
           :class="getItemClasses(project)"
           @click.stop="onItemClick(project)"
@@ -121,6 +121,7 @@
   <style scoped lang="sass">
   button
     transition: opacity 0.3s ease, font-variation-settings 0.5s ease
+    cursor: pointer
   
   button:hover
     font-variation-settings: "wght" 10

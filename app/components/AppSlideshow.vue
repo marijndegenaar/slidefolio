@@ -70,11 +70,11 @@
           class="absolute bottom-2 left-2 text-sm w-2x3 mix-blend-difference z-20"
         ) {{ slide.caption }}
   
-      span.nav-cursor(
+      span.nav-cursor.text-base(
         v-show="!infoOpen"
         :class="{ 'is-visible': cursorVisible }"
-        :style="{ left: cursorX  + 'px', top: cursorY + 'px' }"
-      ) {{ cursorOnLeft ? '&#8592;' : '&#8594;' }}
+        :style="{ left: cursorX + 10 + 'px', top: cursorY + 30 + 'px' }"
+      ) {{ cursorOnLeft ? '← prev' : 'next →' }}
 
       //- Global Mute/Unmute Button
       button.absolute.bottom-4.right-4.z-50.text-2xl.drop-shadow-md.transition-transform.hover_scale-110(
@@ -286,7 +286,7 @@ function applyMuteState(index: number) {
 
 <style scoped lang="sass">
 .slideshow
-  cursor: none
+  /* cursor: none */
 
 /* CSS trick to make 16:9 iframes act like object-fit: cover */
 .iframe-cover
@@ -304,14 +304,14 @@ function applyMuteState(index: number) {
   z-index: 30
   pointer-events: none
   transform: translate(-50%, -50%)
-  font-size: 1.5rem
-  color: #e0dee5
+  font-size: .8rem
+  color: #fff
   mix-blend-mode: difference
   opacity: 0
   transition: opacity 0.15s ease
 
 .nav-cursor.is-visible
-  opacity: 0.5
+  opacity: 1
 
 @media (hover: none), (pointer: coarse), (max-width: 768px)
   .nav-cursor
