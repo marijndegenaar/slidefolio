@@ -1,5 +1,5 @@
 <template lang="pug">
-  div.fixed.inset-0.z-0.bg-neutral-800(
+  div.fixed.inset-0.z-0.bg-neutral-800.overflow-hidden(
     ref="containerRef"
     tabindex="0"
     @click="onClick"
@@ -14,36 +14,42 @@
     @keydown.enter.prevent="next"
   )
     template(v-if="slideshow.length")
-      div.absolute.inset-0(
+      //- Added transition classes for smooth fading
+      div.absolute.inset-0.transition-opacity.duration-700.ease-in-out(
         v-for="(slide, i) in slideshow"
         :key="i"
         :class="{ 'opacity-100 z-10': i === currentIndex, 'opacity-0 pointer-events-none': i !== currentIndex }"
       )
         //- Vimeo
         template(v-if="getVideoType(slide) === 'vimeo'")
-          div.relative.w-full.h-full
-            iframe.w-full.h-full(
+          div.relative.w-full.h-full.overflow-hidden.bg-black
+            iframe.pointer-events-none(
+              :class="objectFit === 'cover' ? 'iframe-cover' : 'w-full h-full'"
+              :ref="el => setMediaRef(el, i)"
               :src="vimeoEmbedUrl(slide.media.url)"
               frameborder="0"
               allow="autoplay; fullscreen"
             )
-            div.absolute.inset-0
   
         //- YouTube
         template(v-else-if="getVideoType(slide) === 'youtube'")
-          iframe.w-full.h-full(
-            :src="youtubeEmbedUrl(slide.media.url)"
-            frameborder="0"
-            allow="autoplay; fullscreen"
-            allowfullscreen
-          )
+          div.relative.w-full.h-full.overflow-hidden.bg-black
+            iframe.pointer-events-none(
+              :class="objectFit === 'cover' ? 'iframe-cover' : 'w-full h-full'"
+              :ref="el => setMediaRef(el, i)"
+              :src="youtubeEmbedUrl(slide.media.url)"
+              frameborder="0"
+              allow="autoplay; fullscreen"
+              allowfullscreen
+            )
   
-        //- Direct video file (Prismic media library)
+        //- Direct video file
         template(v-else-if="getVideoType(slide) === 'file'")
           video.w-full.h-full(
+            :ref="el => setMediaRef(el, i)"
             :src="slide.media.url"
             autoplay
-            muted
+            :muted="isMuted"
             loop
             playsinline
             :class="objectFit === 'cover' ? 'object-cover' : 'object-contain'"
@@ -61,19 +67,27 @@
   
         p(
           v-if="slide.caption"
-          class="absolute bottom-2 left-2 text-sm w-2x3 mix-blend-difference"
+          class="absolute bottom-2 left-2 text-sm w-2x3 mix-blend-difference z-20"
         ) {{ slide.caption }}
   
       span.nav-cursor(
         :class="{ 'is-visible': cursorVisible }"
         :style="{ left: cursorX + 'px', top: cursorY + 'px' }"
       ) {{ cursorOnLeft ? '&#8592;' : '&#8594;' }}
+
+      //- Global Mute/Unmute Button
+      button.absolute.bottom-4.right-4.z-50.text-2xl.drop-shadow-md.transition-transform.hover_scale-110(
+        v-if="currentIsVideo"
+        @click.stop="toggleMute"
+      )
+        | {{ isMuted ? '🔇' : '🔊' }}
   
-    div.flex.items-center.justify-center(v-else)
+    div.flex.items-center.justify-center.h-full(v-else)
       p No slides
   </template>
 
 <script setup lang="ts">
+import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import type { ProjectDocumentDataSlideshowItem } from '~~/prismicio-types'
 
 const props = defineProps<{
@@ -95,6 +109,10 @@ const isRotated = ref(false)
 const isMobile = ref(false)
 const isTouchLike = ref(false)
 
+// Audio specific refs
+const isMuted = ref(true)
+const mediaRefs = ref<Record<number, HTMLIFrameElement | HTMLVideoElement | null>>({})
+
 const ROTATION_QUERY = '(max-width: 768px) and (orientation: portrait)'
 const MOBILE_QUERY = '(max-width: 768px)'
 const TOUCH_LIKE_QUERY = '(hover: none), (pointer: coarse)'
@@ -104,8 +122,6 @@ onMounted(() => {
   isRotated.value = mq.matches
   mq.addEventListener('change', (e) => { isRotated.value = e.matches })
 
-  // Important: keep initial (SSR + first hydration) render deterministic.
-  // Only decide viewport-dependent image params after hydration.
   const mqMobile = window.matchMedia(MOBILE_QUERY)
   isMobile.value = mqMobile.matches
   mqMobile.addEventListener('change', (e: MediaQueryListEvent) => { isMobile.value = e.matches })
@@ -117,9 +133,17 @@ onMounted(() => {
 
 const mobileImgixParams = computed(() => {
   if (!isMobile.value) return undefined
-  // Remove Imgix `compress` while keeping modern formats.
   return { auto: ['format'], q: 90 }
 })
+
+const currentIsVideo = computed(() => {
+  if (!props.slideshow.length) return false
+  return getVideoType(props.slideshow[currentIndex.value]) !== null
+})
+
+function setMediaRef(el: any, index: number) {
+  mediaRefs.value[index] = el
+}
 
 function toggleObjectFit() {
   objectFit.value = objectFit.value === 'cover' ? 'contain' : 'cover'
@@ -128,6 +152,13 @@ function toggleObjectFit() {
 watch(() => props.slideshow, () => {
   currentIndex.value = 0
 }, { immediate: true })
+
+watch(currentIndex, (newIndex) => {
+  // Apply current mute state to the newly active video
+  nextTick(() => {
+    applyMuteState(newIndex)
+  })
+})
 
 function onMouseMove(e: MouseEvent) {
   if (isTouchLike.value) return
@@ -138,8 +169,6 @@ function onMouseMove(e: MouseEvent) {
 }
 
 function onMouseEnter() {
-  // On touch devices some browsers still synthesize hover/mouse events.
-  // Avoid turning the arrow overlay on in that case.
   if (isTouchLike.value) return
   cursorVisible.value = true
 }
@@ -205,28 +234,66 @@ function getVideoType(slide: ProjectDocumentDataSlideshowItem): VideoType {
   if (!url) return null
   if (/vimeo\.com/i.test(url)) return 'vimeo'
   if (/youtu\.be|youtube\.com/i.test(url)) return 'youtube'
-  // Treat any other filled link as a direct file
   return 'file'
 }
 
 function vimeoEmbedUrl(url: string): string {
-  // Handles https://vimeo.com/123456789 and https://vimeo.com/channels/x/123456789
   const match = url.match(/vimeo\.com\/(?:.*\/)?(\d+)/)
   const id = match?.[1] ?? ''
-  return `https://player.vimeo.com/video/${id}?autoplay=1&muted=1&loop=1&background=1`
+  return `https://player.vimeo.com/video/${id}?autoplay=1&muted=1&loop=1&controls=0&api=1`
 }
 
 function youtubeEmbedUrl(url: string): string {
-  // Handles youtu.be/ID and youtube.com/watch?v=ID
   const match = url.match(/(?:youtu\.be\/|[?&]v=)([\w-]{11})/)
   const id = match?.[1] ?? ''
-  return `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&loop=1&playlist=${id}&controls=0`
+  return `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&loop=1&playlist=${id}&controls=0&enablejsapi=1`
+}
+
+// --- Audio Controls ---
+
+function toggleMute() {
+  isMuted.value = !isMuted.value
+  applyMuteState(currentIndex.value)
+}
+
+function applyMuteState(index: number) {
+  const el = mediaRefs.value[index]
+  if (!el) return
+  
+  const slide = props.slideshow[index]
+  const type = getVideoType(slide)
+
+  if (type === 'file' && el instanceof HTMLVideoElement) {
+    el.muted = isMuted.value
+  } else if (type === 'vimeo' && el instanceof HTMLIFrameElement) {
+    el.contentWindow?.postMessage(JSON.stringify({
+      method: 'setVolume',
+      value: isMuted.value ? 0 : 1
+    }), '*')
+  } else if (type === 'youtube' && el instanceof HTMLIFrameElement) {
+    el.contentWindow?.postMessage(JSON.stringify({
+      event: 'command',
+      func: isMuted.value ? 'mute' : 'unMute',
+      args: []
+    }), '*')
+  }
 }
 </script>
 
 <style scoped lang="sass">
 div.fixed
   cursor: none
+
+/* CSS trick to make 16:9 iframes act like object-fit: cover */
+.iframe-cover
+  position: absolute
+  top: 50%
+  left: 50%
+  width: 100vw
+  height: 56.25vw  // 100 * 9 / 16 (16:9 aspect ratio)
+  min-height: 100vh
+  min-width: 177.77vh // 100 * 16 / 9 (16:9 aspect ratio)
+  transform: translate(-50%, -50%)
 
 .nav-cursor
   position: fixed
@@ -242,14 +309,10 @@ div.fixed
 .nav-cursor.is-visible
   opacity: 0.5
 
-// On touch/coarse-pointer devices, don't show the custom "arrow cursor".
-// Some mobile browsers still synthesize hover/mouse events, which can make
-// the cursor appear even without a pointing device.
 @media (hover: none), (pointer: coarse), (max-width: 768px)
   .nav-cursor
     display: none !important
 
-  // Be explicit: ensure the native cursor arrow stays hidden on mobile too.
   div.fixed
-    cursor: none !important
+    cursor: auto !important
 </style>

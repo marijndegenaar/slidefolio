@@ -18,7 +18,6 @@
         :field="about?.data?.information"
         @close="infoOpen = false"
       )
-  a.credit.fixed.text-xs.bottom-2.right-2.mix-difference.opacity-30.uppercase(href="http://marijdegenaar.net") site by MD
 </template>
 
 <script setup lang="ts">
